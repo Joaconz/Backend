@@ -99,16 +99,16 @@ class ProductManager {
   }
 
   updateProduct = async (id, updateName, update) => {
-    let product = await this.getProductById(id)
-    await this.deleteProduct(id) 
-    let keys = Object.keys(product)
-    keys.forEach((item)=>{
-      if(item === updateName){
-        product[item] = update
-      }
-    })
-    this.#products.push(product)
-    await this.addProductsToFile(this.path, this.#products)
+    if (updateName === 'id') {
+      console.log('No puedes cambiar el ID del producto');
+    }
+    else{
+      let product = await this.getProductById(id)
+      await this.deleteProduct(id)
+      product[update] = update 
+      this.#products.push(product)
+      await this.addProductsToFile(this.path, this.#products)
+    }
   }
 
 }
