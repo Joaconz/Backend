@@ -1,20 +1,23 @@
 class ProductManager {
+  #products
+  #codes
   constructor() {
-    this.products = [];
+    this.#products = [];
     this.id = 0;
-    this.codes = [];
+    this.#codes = [];
   }
 
   getproducts = () => {
-    console.log(this.products)
+    return this.#products
   };
 
   addProducts = (title, description, price, thumbnail, code, stock) => {
     const newProduct = () => {
-      this.codes.push(code);
-      this.id += 1;
-      this.products.push({
-        id: this.id,
+      this.#codes.push(code);
+      let newId = 1
+      if (this.#products.length > 0) newId = this.#products.length + 1
+      this.#products.push({
+        id: newId,
         title: title,
         description: description,
         price: price,
@@ -24,10 +27,10 @@ class ProductManager {
       });
     };
 
-    if (this.products.length === 0) {
+    if (this.#products.length === 0) {
       newProduct();
     } else {
-      if (this.codes.includes(code)) {
+      if (this.#codes.includes(code)) {
         console.log("El producto ya existe");
       } else {
         newProduct();
@@ -40,10 +43,10 @@ class ProductManager {
       return product.id === id;
     }
 
-    if (this.products.find(findId) === undefined) {
+    if (this.#products.find(findId) === undefined) {
       console.log("No existe producto con ese ID");
     } else {
-      console.log(this.products.find(findId));
+      console.log(this.#products.find(findId));
     }
   };
 }
