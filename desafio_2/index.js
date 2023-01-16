@@ -1,3 +1,5 @@
+const { arrayBuffer } = require('stream/consumers');
+
 class ProductManager {
   #products
   #codes
@@ -59,7 +61,6 @@ class ProductManager {
 
   getProductById = async (id) => {
     let data = await this.getProducts()
-    //console.log(data)
 
     function findId(product) {
       return product.id === id;
@@ -96,42 +97,39 @@ class ProductManager {
       this.addProductsToFile(this.path, this.#products)
     }
   }
+
+  updateProduct = async (id, updateName, update) => {
+    let product = await this.getProductById(id)
+    await this.deleteProduct(id) 
+    let keys = Object.keys(product)
+    keys.forEach((item)=>{
+      if(item === updateName){
+        product[item] = update
+      }
+    })
+    this.#products.push(product)
+    await this.addProductsToFile(this.path, this.#products)
+  }
+
 }
 
 const productManager = new ProductManager('./archivo.json');
 productManager.addProducts(
-  "producto prueba",
-  "Este es un producto prueba",
-  200,
-  "Sin imagen",
-  "abc123",
-  25
-);
-// console.log(productManager.getproducts())
-// productManager.addProducts(
-//   "producto prueba",
-//   "Este es un producto prueba",
-//   200,
-//   "Sin imagen",
-//   "abc123",
-//   25
-// );
-productManager.addProducts(
-  "PRODUCTO NUEVO",
-  "PRODUCT NUEVO",
-  200,
-  "Sin imagen",
-  "abd123",
-  25
+  "producto prueba", //title
+  "Este es un producto prueba", //description
+  200, //price
+  "Sin imagen", //thumbnail
+  "abc123", //code
+  25 //stock
 );
 // productManager.addProducts(
-//   "producto prueba",
-//   "Este es un producto prueba",
+//   "PRODUCTO NUEVO",
+//   "PRODUCT NUEVO",
 //   200,
 //   "Sin imagen",
-//   "abe123",
+//   "abd123",
 //   25
 // );
 //productManager.getProductById(1);
-productManager.deleteProduct(1)
-
+//productManager.deleteProduct(1)
+productManager.updateProduct(1, 'title', 'nuevo titulo') //id, propiedad, valor
