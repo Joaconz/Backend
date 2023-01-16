@@ -18,14 +18,15 @@ class ProductManager {
     await fs.promises.writeFile(path, JSON.stringify(data))
   }
 
-  getProducts = async (path) => {
+  getProducts = async () => {
     const fs = require('fs')
-    let array = []
-    await fs.promises.readFile(path, (err, data)=>{
-      if (err) console.log(err)
-      else {array = JSON.stringify(data)}
-    })
-    return array
+    try {
+      let data = await fs.promises.readFile(this.path, 'utf-8')
+      let dataJS = JSON.parse(data)
+      return dataJS
+    } catch (error){
+      console.log(error)
+    }
   };
 
   addProducts = (title, description, price, thumbnail, code, stock) => {
@@ -56,17 +57,45 @@ class ProductManager {
     }
   };
 
-  getProductById = (id) => {
+  getProductById = async (id) => {
+    let data = await this.getProducts()
+    //console.log(data)
+
     function findId(product) {
       return product.id === id;
     }
 
-    if (this.#products.find(findId) === undefined) {
+    if (data.find(findId) === undefined) {
       console.log("No existe producto con ese ID");
     } else {
-      console.log(this.#products.find(findId));
+      return data.find(findId);
     }
   };
+
+  deleteProduct = async (id) => {
+    let data = await this.getProducts()
+    
+    function findId(product) {
+      return product.id === id;
+    }
+
+    function removeObjectWithId(arr, id) {
+      const objWithIdIndex = arr.findIndex((obj) => obj.id === id);
+    
+      if (objWithIdIndex > -1) {
+        arr.splice(objWithIdIndex, 1);
+      }
+    
+      return arr;
+    }    
+
+    if (data.find(findId) === undefined) {
+      console.log("No existe producto con ese ID");
+    } else {
+      removeObjectWithId(this.#products, id)
+      this.addProductsToFile(this.path, this.#products)
+    }
+  }
 }
 
 const productManager = new ProductManager('./archivo.json');
@@ -103,5 +132,6 @@ productManager.addProducts(
 //   "abe123",
 //   25
 // );
-// productManager.getProductById(1);
-console.log(productManager.getProducts('./archivo.json'));
+//productManager.getProductById(1);
+productManager.deleteProduct(1)
+
