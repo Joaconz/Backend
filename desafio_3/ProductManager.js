@@ -1,16 +1,22 @@
-const fs = require('fs')
-class ProductManager {
+import fs from 'fs'
+export default class ProductManager {
   #products
   #codes
   constructor(path) {
     this.path = path
-    this.#products = [];
+    this.#products = this.readProducts()
     this.#codes = [];
-    this.createFile(path)
   }
 
-  async createFile (path) {
-    await fs.promises.writeFile(path, JSON.stringify(this.#products))
+  async readProducts () {
+    const result = await this.getProducts()
+    if (typeof(result)==='object') {
+      return result
+    }
+    else {
+      await fs.promises.writeFile(this.path, JSON.stringify(this.#products))
+      return []
+    }
   }
 
   async addProductsToFile (path, data) {
@@ -64,6 +70,7 @@ class ProductManager {
 
     if (data.find(findId) === undefined) {
       console.log("No existe producto con ese ID");
+      return {error: 'No existe producto con ese ID'}
     } else {
       return data.find(findId);
     }
@@ -108,24 +115,3 @@ class ProductManager {
   }
 
 }
-
-const productManager = new ProductManager('./archivo.json');
-productManager.addProducts(
-  "producto prueba", //title
-  "Este es un producto prueba", //description
-  200, //price
-  "Sin imagen", //thumbnail
-  "abc123", //code
-  25 //stock
-);
-// productManager.addProducts(
-//   "PRODUCTO NUEVO",
-//   "PRODUCT NUEVO",
-//   200,
-//   "Sin imagen",
-//   "abd123",
-//   25
-// );
-//productManager.getProductById(1);
-//productManager.deleteProduct(1)
-productManager.updateProduct(1, 'title', 'nuevo titulo') //id, propiedad, valor
