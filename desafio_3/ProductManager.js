@@ -4,22 +4,22 @@ export default class ProductManager {
   #codes
   constructor(path) {
     this.path = path
-    this.#products = this.readProducts()
+    this.#products = []
     this.#codes = [];
+    this.#createFile()
   }
 
-  async readProducts () {
-    const result = await this.getProducts()
-    if (typeof(result)==='object') {
-      return result
-    }
-    else {
-      await fs.promises.writeFile(this.path, JSON.stringify(this.#products))
-      return []
+  async #createFile () {
+    try {
+      let data = await fs.promises.readFile(this.path, 'utf-8')
+      let dataJS = JSON.parse(data)
+      this.#products = dataJS
+    } catch (error){
+      await this.#addProductsToFile(this.path, this.#products)
     }
   }
 
-  async addProductsToFile (path, data) {
+  async #addProductsToFile (path, data) {
     await fs.promises.writeFile(path, JSON.stringify(data))
   }
 
@@ -47,7 +47,7 @@ export default class ProductManager {
         code: code,
         stock: stock
       });
-      this.addProductsToFile(this.path, this.#products)
+      this.#addProductsToFile(this.path, this.#products)
     };
 
     if (this.#products.length === 0) {
@@ -70,7 +70,6 @@ export default class ProductManager {
 
     if (data.find(findId) === undefined) {
       console.log("No existe producto con ese ID");
-      return {error: 'No existe producto con ese ID'}
     } else {
       return data.find(findId);
     }
@@ -97,7 +96,7 @@ export default class ProductManager {
       console.log("No existe producto con ese ID");
     } else {
       removeObjectWithId(this.#products, id)
-      this.addProductsToFile(this.path, this.#products)
+      this.#addProductsToFile(this.path, this.#products)
     }
   }
 
@@ -110,7 +109,7 @@ export default class ProductManager {
       await this.deleteProduct(id)
       product[updateName] = update 
       this.#products.push(product)
-      await this.addProductsToFile(this.path, this.#products)
+      await this.#addProductsToFile(this.path, this.#products)
     }
   }
 
