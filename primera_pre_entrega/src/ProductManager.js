@@ -77,7 +77,7 @@ export default class ProductManager {
     }
   };
 
-  async deleteProduct (id) {
+  async #delete (id) {
     let data = await this.getProducts()
     
     function findId(product) {
@@ -108,11 +108,18 @@ export default class ProductManager {
     }
     else{
       let product = await this.getProductById(id)
-      await this.deleteProduct(id)
+      await this.#delete(id)
       product[updateName] = update 
       this.#products.push(product)
       await this.#addProductsToFile(this.path, this.#products)
     }
   }
 
+  async deleteProduct (id) {
+      let product = await this.getProductById(id)
+      await this.#delete(id)
+      product["status"] = false 
+      this.#products.push(product)
+      await this.#addProductsToFile(this.path, this.#products)
+  }
 }

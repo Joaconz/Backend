@@ -47,11 +47,6 @@ router.put('/:pid', async (req, res)=>{
     const { pid } = req.params
     let product = req.body
     let entries = Object.entries(product)
-    // console.log(entries);
-    // for (let index = 0; index < array.length; index++) {
-    //     const element = array[index];
-        
-    // }
     entries.forEach(async (keyValue)=>{
         console.log(pid, keyValue[0], keyValue[1]);
         productManager.updateProduct(parseInt(pid), keyValue[0], keyValue[1])
@@ -64,13 +59,13 @@ router.put('/:pid', async (req, res)=>{
 
 })
 
-// router.delete('/:pid', (req, res)=>{
-    
-// })
-
-// router.get('/', (req, res)=>{
-    
-// })  
+router.delete('/:pid', async (req, res)=>{
+    const { pid } = req.params
+    productManager.deleteProduct(parseInt(pid))
+    res.status(201).send({ 
+        message: 'Producto Eliminado' 
+    })
+})
 
 export default router
 
