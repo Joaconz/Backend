@@ -43,9 +43,26 @@ router.post('/', async (req, res)=>{
     
 })  
 
-// router.put('/:pid', (req, res)=>{
-    
-// })
+router.put('/:pid', async (req, res)=>{
+    const { pid } = req.params
+    let product = req.body
+    let entries = Object.entries(product)
+    // console.log(entries);
+    // for (let index = 0; index < array.length; index++) {
+    //     const element = array[index];
+        
+    // }
+    entries.forEach(async (keyValue)=>{
+        console.log(pid, keyValue[0], keyValue[1]);
+        productManager.updateProduct(parseInt(pid), keyValue[0], keyValue[1])
+    })
+
+    res.status(201).send({ 
+        product,
+        message: 'usuario Modificado' 
+    })
+
+})
 
 // router.delete('/:pid', (req, res)=>{
     
