@@ -33,7 +33,7 @@ export default class ProductManager {
     }
   };
 
-  addProducts (title, description, price, thumbnail, code, stock) {
+  addProducts (title, description, price, thumbnail, code, stock, category) {
     const newProduct = () => {
       this.#codes.push(code);
       let newId = 1
@@ -45,7 +45,9 @@ export default class ProductManager {
         price: price,
         thumbnail: thumbnail,
         code: code,
-        stock: stock
+        stock: stock,
+        category: category,
+        status: true
       });
       this.#addProductsToFile(this.path, this.#products)
     };

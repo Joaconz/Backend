@@ -1,8 +1,8 @@
-import ProductManager from '../ProductManager'
+import ProductManager from '../ProductManager.js'
 import { Router } from 'express'
 
 const router = Router()
-const productManager = new ProductManager('../products.json');
+const productManager = new ProductManager('./src/products.json');
 
 const queryImport = async (limit) => {
     const array = []
@@ -25,23 +25,35 @@ router.get('/', async (req, res)=>{
 })  
 
 router.get('/:pid', async (req, res)=>{
-    const { id } = req.params
-    let info = await paramsImport(parseInt(id))
+    const { pid } = req.params
+    let info = await productManager.getProductById(parseInt(pid))
     res.send(info)
 })  
 
-router.post('/', (req, res)=>{
+router.post('/', async (req, res)=>{
+        let product = req.body
+        if (!product.title || !product.description || !product.code || !product.price || !product.stock || !product.category) {
+            return res.status(400).send({ message: 'Completar los datos faltantes'})
+        }
+        productManager.addProducts(product.title, product.description, product.price, product.thumbnail, product.code, product.stock, product.category)
+        res.status(201).send({ 
+            product,
+            message: 'usuario creado' 
+        })
     
 })  
 
-router.put('/:pid', (req, res)=>{
+// router.put('/:pid', (req, res)=>{
     
-})
+// })
 
-router.delete('/:pid', (req, res)=>{
+// router.delete('/:pid', (req, res)=>{
     
-})
+// })
 
-router.get('/', (req, res)=>{
+// router.get('/', (req, res)=>{
     
-})  
+// })  
+
+export default router
+
