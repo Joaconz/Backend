@@ -2,6 +2,7 @@ import express, { json, urlencoded} from 'express'
 // import cookieParser from 'cookie-parser'
 // import usersRouter from './routes/users.router.js'
 import productsRouter from './routes/products.js'
+import cartsRouter from './routes/carts.js'
 // import { uploader } from './utils.js'
 
 const app = express()
@@ -15,6 +16,7 @@ app.use(urlencoded({extended:true}))
 
 
 app.use('/api/products', productsRouter)
+app.use('/api/carts', cartsRouter)
 
 
 app.listen(PORT,err =>{
