@@ -13,11 +13,11 @@ export default class CartManager {
           let dataJS = JSON.parse(data)
           this.#carts = dataJS
         } catch (error){
-          await this.#addProductsToFile(this.path, this.#carts)
+          await this.#addCartToFile(this.path, this.#carts)
         }
     }
 
-    async #addProductsToFile (path, data) {
+    async #addCartToFile (path, data) {
         await fs.promises.writeFile(path, JSON.stringify(data))
     }
 
@@ -28,7 +28,7 @@ export default class CartManager {
             id: newId,
             products: []
         })
-        this.#addProductsToFile(this.path, this.#carts)
+        this.#addCartToFile(this.path, this.#carts)
     }
 
     async #allCarts (){
@@ -41,9 +41,8 @@ export default class CartManager {
           }
     }
 
-    async getProducts (id){
+    async getCart (id){
         let data = await this.#allCarts()
-        // console.log(data);
 
         function findId(cart) {
             return cart.id === id;
@@ -52,12 +51,43 @@ export default class CartManager {
           if (data.find(findId) === undefined) {
             console.log("No existe carrito con ese ID");
           } else {
-            // console.log(data.find(findId));
             return data.find(findId);
           }
     }
 
-    async addProduct (cid, pid, quantity){
+    async addProduct (cid, pid){
+        let cart = await this.getCart(cid)
+        let products = cart.products
 
+        function findId(product) {
+            return product.id === pid;
+        }
+      
+          if (products.find(findId) === undefined) {
+            products.push({
+                id: pid,
+                quantity: 1
+            })
+            this.#reWriteCart(cart)
+            return cart
+          }
+          else {
+            products.find(findId).quantity++
+            this.#reWriteCart(cart)
+            return cart
+          } 
+    }
+
+    async #reWriteCart(newCart) {
+
+      function removeObjectWithId(arr, id) {
+        const objWithIdIndex = arr.findIndex((obj) => obj.id === id);
+        if (objWithIdIndex > -1) arr.splice(objWithIdIndex, 1)
+        return arr;
+      }
+
+        removeObjectWithId(this.#carts, newCart.id)
+        this.#carts.push(newCart)
+        this.#addCartToFile(this.path, this.#carts)
     }
 }
