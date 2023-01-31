@@ -2,7 +2,7 @@ import ProductManager from '../ProductManager.js'
 import { Router } from 'express'
 
 const router = Router()
-const productManager = new ProductManager('./src/products.json');
+const productManager = new ProductManager('./json/products.json');
 
 const queryImport = async (limit) => {
     const array = []

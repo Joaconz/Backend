@@ -3,7 +3,7 @@ import CartManager from '../CartManager.js'
 
 const router = Router()
 
-const cartManager = new CartManager('./src/carts.json');
+const cartManager = new CartManager('./json/carts.json');
 
 
 router.post('/', async (req, res)=>{
