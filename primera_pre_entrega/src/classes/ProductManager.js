@@ -43,7 +43,7 @@ export default class ProductManager {
         title: title,
         description: description,
         price: price,
-        thumbnail: thumbnail,
+        thumbnail: (thumbnail===undefined? "Sin imagen" : thumbnail),
         code: code,
         stock: stock,
         category: category,

@@ -1,4 +1,4 @@
-import ProductManager from '../ProductManager.js'
+import ProductManager from '../classes/ProductManager.js'
 import { Router } from 'express'
 
 const router = Router()
@@ -31,13 +31,12 @@ router.get('/:pid', async (req, res)=>{
 })  
 
 router.post('/', async (req, res)=>{
-        let product = req.body
-        if (!product.title || !product.description || !product.code || !product.price || !product.stock || !product.category) {
+        let {title, description, code, price, stock, category, thumbnail} = req.body
+        if (!title || !description || !code || !price || !stock || !category) {
             return res.status(400).send({ message: 'Completar los datos faltantes'})
         }
-        productManager.addProducts(product.title, product.description, product.price, product.thumbnail, product.code, product.stock, product.category)
+        productManager.addProducts(title, description, price, thumbnail, code, stock, category)
         res.status(201).send({ 
-            product,
             message: 'usuario creado' 
         })
     

@@ -23,15 +23,16 @@ app.use('/api/products', productsRouter)
 app.use('/api/carts', cartsRouter)
 
 app.engine('handlebars', handlebars.engine())
-app.set('views', __dirname+'views')
+app.set('views', __dirname+'/views')
 app.set('view engine', 'handlebars')
 
 app.get('/', (req, res)=>{
     
+
     // array.forEach(name => {
     //     res.render('index', name)
     // });
-    res.render('index', 'joaco')
+    res.render('index', {name: 'joaco'})
 })
 
 
