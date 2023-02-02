@@ -1,4 +1,4 @@
-import ProductManager from '../ProductManager.js'
+import ProductManager from '../classes/ProductManager.js'
 import { Router } from 'express'
 
 const router = Router()
