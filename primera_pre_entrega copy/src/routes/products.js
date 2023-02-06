@@ -21,7 +21,10 @@ const queryImport = async (limit) => {
 router.get('/', async (req, res)=>{
     const {limit} = req.query
     let info = await queryImport(limit)
-    res.send(info)
+    // res.send(info)
+    res.render('home', {
+        info
+    })
 })  
 
 router.get('/:pid', async (req, res)=>{
