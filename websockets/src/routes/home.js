@@ -6,13 +6,7 @@ const productManager = new ProductManager('./json/products.json');
 
 router.get('/', async (req, res)=>{
     let products = await productManager.getProducts()
-    res.render('realTimeProducts', {products})
-    // console.log(req.body);
-})
-
-router.post('/', async (req, res)=>{
-    let product = res.body
-
+    res.render('home', {products})
 })
 
 export default router

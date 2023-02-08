@@ -1,8 +1,10 @@
 <div>
-    <p>Home</p>
-    {{#each info}}
+    <h3>Home Products</h3>
+    {{#each products}}
     <div>
-        <p>{{this.title}}</p>
+        <ul>
+            <li>{{this.title}}: {{this.price}}$</li>
+        </ul>
     </div>
     {{/each}}
 </div>
