@@ -8,7 +8,6 @@ export default class ProductManager {
 
   async getProducts () {
     this.#products = await ProductModel.find({})
-    console.log(this.#products);
     return this.#products
   }
 

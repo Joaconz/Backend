@@ -1,17 +1,22 @@
 import { Schema, model } from 'mongoose'
 const cartCollection = 'carts'
 
-const ProductSchema = new Schema({
-    quantity : {
-        type: Number,
-        default: 1
-    }
-})
-
 const CartSchema = new Schema({
-    products: [
-        ProductSchema
-    ]
+    products: {
+        type: [{
+            productId: {
+                type: Schema.Types.ObjectId,
+                ref: 'products',
+                index: true
+            },
+            quantity: {
+                type: Number,
+                default: 1
+            }
+            
+        }]
+    }
+
 })
 
 const CartModel = model(cartCollection, CartSchema)

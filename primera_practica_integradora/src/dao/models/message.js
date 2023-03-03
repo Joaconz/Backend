@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose'
 
 const messageCollection = 'messages'
-const MessageSchema = Schema({
+const MessageSchema = Schema({    
     user: {
         type: String,
         required: true
@@ -10,7 +10,6 @@ const MessageSchema = Schema({
         type: String,
         default: ''
     }
-
 })
 
 const MessageModel = model(messageCollection, MessageSchema)
