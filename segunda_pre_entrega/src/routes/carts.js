@@ -16,7 +16,7 @@ router.get('/:cid', async (req, res)=>{
     //mostrar el array de productos del carrito seleccionado
     const { cid } = req.params
     let cart = await cartManager.getCart(cid)
-    res.status(201).send(cart.products)
+    res.status(201).send({products: cart.products})
 })
 
 router.put('/:cid/products/:pid', async (req, res)=>{

@@ -8,7 +8,7 @@ router.get('/', async (req, res)=>{
     const {limit, page, query, sort } = req.query
     let info = await productManager.getProducts(limit, page, query, sort)
     let products = info.docs
-    // console.log(products);
+    console.log(products);
     res.render('products', {
         products
     })
