@@ -6,8 +6,13 @@ export default class ProductManager {
     this.#products = [];
   }
 
-  async getProducts () {
-    this.#products = await ProductModel.find({})
+  async getProducts (limit, page, query, sort) {
+    let getLimit = limit !== undefined ? limit : 10
+    let getPage = page !== undefined ? page: 1
+    let getQuery = query !== undefined ? {category: query} : {}
+    let getSort = sort === '-'? sort : '+'
+
+    this.#products = await ProductModel.paginate(getQuery, {limit:getLimit, page:getPage, sort: `${getSort}price`})
     return this.#products
   }
 

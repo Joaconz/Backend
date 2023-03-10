@@ -4,33 +4,29 @@ import { Router } from 'express'
 const router = Router()
 const productManager = new ProductManager();
 
-const queryImport = async (limit) => {
-    const array = []
-    if (limit === undefined) {
-        console.log('products');
-        return await productManager.getProducts() 
-    }
-    else {
-        for (let index = 1; index <= limit; index++) {
-            array.push(await productManager.getProductById(index))
-        }
-        return array
-    }
-}
-
-
 router.get('/', async (req, res)=>{
-    const {limit} = req.query
-    let info = await queryImport(limit)
-    res.send({
-        info
-    })
+    const {limit, page, query, sort } = req.query
+    let products = await productManager.getProducts(limit, page, query, sort)
+    let info = {
+        status: products !== undefined ? 'success' : 'error',
+        payload: products.docs,
+        totalPages: products.totalPages,
+        prevPage: products.prevPage,
+        nextPage: products.nextPage,
+        page: products.page,
+        hasPrevPage: products.hasPrevPage,
+        hasNextPage: products.hasNextPage,
+        prevLink: products.prevLink,
+        nextLink: products.nextLink,
+    }
+    // res.render('products', {info})
+    res.send(info)
 })  
 
 router.get('/:pid', async (req, res)=>{
     const { pid } = req.params
-    let info = await productManager.getProductById(parseInt(pid))
-    res.send(info)
+    let products = await productManager.getProductById(parseInt(pid))
+    res.send(products)
 })  
 
 router.post('/', async (req, res)=>{
