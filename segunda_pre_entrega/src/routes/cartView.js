@@ -8,11 +8,13 @@ const cartManager = new CartManager();
 router.get('/:cid', async (req, res)=>{
     const { cid } = req.params
     let info = await cartManager.getCart(cid)
-    // console.log(info);
+    let products = info.products
+    products = products.map(item => item.toObject())
     let cart = {
         _id: info._id,
-        products: info.products
+        products
     }
+    // cart =  cart.map(item => item.toObject())
     res.render('carts', {
         cart
     })
