@@ -1,5 +1,5 @@
 function auth (req, res, next){
-    if (req.session?.user === 'joaco' && req.session?.admin ) {
+    if (req.session) {
         return next()
     }
 

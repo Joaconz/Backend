@@ -21,7 +21,6 @@ router.get('/', async (req, res)=>{
         prevLink: products.prevLink,
         nextLink: products.nextLink,
     }
-    // res.render('products', {info})
     res.send(info)
 })
 
@@ -30,10 +29,14 @@ router.get('/view', async (req, res)=>{
     let info = await productManager.getProducts(limit, page, query, sort)
     let products = info.docs
     products = products.map(item => item.toObject())
+    let user = {
+        "name": req.session.user.name,
+        "isAdmin": req.session.admin? "admin" : "user"
+    }
     res.render('products', {
+        user,
         products
     })
-    // res.send(info)
 })
 
 router.post('/view', async (req, res)=> {
