@@ -1,6 +1,7 @@
 import ProductManager from '../dao/classes/MongoDB/ProductManager.js';
 import CartManager from '../dao/classes/MongoDb/CartManager.js';
 import { Router } from 'express'
+import auth from '../middleware/auth.js';
 
 const router = Router()
 const productManager = new ProductManager();
@@ -30,7 +31,7 @@ router.get('/view', async (req, res)=>{
     let products = info.docs
     products = products.map(item => item.toObject())
     let user = {
-        "name": req.session.user.name,
+        "first_name": req.session.user.first_name? req.session.user.first_name: req.session.user.name,
         "isAdmin": req.session.admin? "admin" : "user"
     }
     res.render('products', {

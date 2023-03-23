@@ -10,7 +10,6 @@ router.get('/github', passport.authenticate('github', {scope:['user:email']}))
 
 router.get('/githubcallback', passport.authenticate('github', {failureRedirect:"/auth/login"}), async (req, res)=>{
     req.session.user = req.user
-    // console.log(req.user);
     res.redirect('/api/products/view')
 })
 // login normal
@@ -43,18 +42,18 @@ router.get('/failregister', async (req, res)=>{
     res.status(400).json({error: 'failed register'})
 })
 
-router.post('/login',passport.authenticate('login', {failureRedirect: '/faillogin'}) , async (req, res)=> {
+router.post('/login',passport.authenticate('login', {failureRedirect: '/auth/faillogin'}) , async (req, res)=> {
 
     req.session.user = {
-        name: `${user.first_name} ${user.last_name}`,
-        email: user.email
+        name: `${req.user.first_name} ${req.user.last_name}`,
+        email: req.user.email
     }
 
     res.status(200).redirect('/api/products/view')
 })
 
 
-router.post('/register', passport.authenticate('register', {failureRedirect: '/failregister'}) ,async (req, res)=> {
+router.post('/register', passport.authenticate('register', {failureRedirect: '/auth/failregister'}) ,async (req, res)=> {
     res.status(200).redirect('login')
 
 })

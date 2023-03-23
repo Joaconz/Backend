@@ -10,6 +10,7 @@ import session from 'express-session'
 import configObject from "./config/connectionDB.js";
 import initializePassport from "./middleware/initialPassport.js";
 import passport from "passport";
+// import initPassport from "./config/initPassport.js";
 
 const app = express();
 const PORT = 8080;
@@ -28,9 +29,10 @@ const httpServer = app.listen(PORT, (err) => {
 
 configObject.dbConnection()
 
+initializePassport()
 app.use(session(configObject.session))
 
-initializePassport()
+
 app.use(passport.initialize())
 app.use(passport.session())
 
