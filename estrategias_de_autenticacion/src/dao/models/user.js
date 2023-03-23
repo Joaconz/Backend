@@ -18,9 +18,9 @@ const UserSchema = Schema({
         unique: true,
         index: true
     },
-    age: {
-        type: Number,
-        required: true
+    role: {
+        type: String,
+        default: 'user'
     },
     password: {
         type: String,

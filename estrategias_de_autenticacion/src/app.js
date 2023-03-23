@@ -1,14 +1,15 @@
 import express, { json, urlencoded } from "express";
 import handlebars from "express-handlebars";
 import useRouter from "./routes/index.js"
-import dbConnection from "./config/connectionDB.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 import session from 'express-session'
-import MongoStore from 'connect-mongo'
+import configObject from "./config/connectionDB.js";
+import initializePassport from "./middleware/initialPassport.js";
+import passport from "passport";
 
 const app = express();
 const PORT = 8080;
@@ -25,17 +26,14 @@ const httpServer = app.listen(PORT, (err) => {
   console.log(`Escuchando en el puerto ${PORT}`);
 });
 
-dbConnection()
+configObject.dbConnection()
 
-app.use(session({
-  store: MongoStore.create({
-    mongoUrl: 'mongodb://localhost:27017/ecommerce',
-    mongoOptions: {useNewUrlParser: true, useUnifiedTopology: true},
-    ttl:150
-  }),
-  secret: "s3cr3t123",
-  resave: false,
-  saveUninitialized: false
-}))
+app.use(session(configObject.session))
+
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
+
+
 
 app.use(useRouter)
