@@ -21,7 +21,7 @@ function initializePassport(){
                     first_name: profile.username,
                     last_name: profile.username, 
                     email: profile._json.email,
-                    password: '',
+                    password: createHash("passwordDefault"),
                 }
                 let result= await UserModel.create(newUser)
                 console.log('created');
