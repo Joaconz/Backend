@@ -1,6 +1,7 @@
 import { Router } from "express";
 import auth from "../middleware/auth.js";
 import ProductController from "../controllers/product.js";
+import authorization from "../middleware/authorization.js";
 
 const router = Router();
 
@@ -12,11 +13,11 @@ router.get("/view", auth("session"), productController.getView);
 
 router.get("/:pid", productController.getPID);
 
-router.post("/", productController.addProduct);
+router.post("/", authorization("admin") ,productController.addProduct);
 
-router.put("/:pid", productController.updateProduct);
+router.put("/:pid", authorization("admin"),productController.updateProduct);
 
-router.delete("/:pid", productController.deleteProduct);
+router.delete("/:pid", authorization("admin"), productController.deleteProduct);
 
 // router.post('/view', auth('session'), async (req, res)=> {
 //     const { id } = req.body

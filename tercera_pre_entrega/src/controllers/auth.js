@@ -1,6 +1,6 @@
 import { request } from "express";
-import UserModel from "../models/user.js";
 import { createHash } from "../utils/bycriptPass.js";
+import { userService } from "../services/index.js";
 
 class AuthController {
   githubCallback = async (req = request, res) => {
@@ -21,20 +21,13 @@ class AuthController {
         .status(401)
         .send({ status: "error", message: "El usuario no existe" });
     } else {
-      if (req.user.first_name == "adminCoder") {
-        req.session.user = {
-          name: `${req.user.first_name}`,
-          email: req.user.email,
-          admin: true
-        };
-      } else {
-        req.session.user = {
-          name: `${req.user.first_name} ${req.user.last_name}`,
-          email: req.user.email,
-        };
-      }
+      const user = await userService.getUserByEmail(req.user.email);
+      req.session.user = {
+        name: `${user.first_name} ${req.user.last_name}`,
+        email: user.email,
+        role: user.role,
+      };
     }
-
     res.status(200).redirect("/api/products/view");
   };
 
@@ -44,7 +37,7 @@ class AuthController {
 
   restorePass = async (req = request, res) => {
     const { email, password } = req.body;
-    const user = await UserModel.findOne({ email });
+    const user = await userService.getUserByEmail(email);
     if (!user)
       return res
         .status(401)

@@ -1,8 +1,9 @@
 import passport from 'passport'
-import UserModel from '../models/user.js'
+// import UserModel from '../models/user.js'
 import local from 'passport-local'
 import GithubStrategy from 'passport-github2'
 import { createHash, isValidPassword } from '../utils/bycriptPass.js'
+import { userService } from '../services/index.js'
 
 const LocalStrategy = local.Strategy
 
@@ -15,7 +16,8 @@ function initializePassport(){
     }, async (accessToken, refreshToken, profile, done)=>{
         console.log('Profile: ',profile)
         try {
-            let user = await UserModel.findOne({email: profile._json.email})
+            // let user = await UserModel.findOne({email: profile._json.email})
+            let user = await userService.getUserByEmail(profile._json.email)
             if (!user) {
                 let newUser = {
                     first_name: profile.username,
@@ -23,7 +25,8 @@ function initializePassport(){
                     email: profile._json.email,
                     password: createHash("passwordDefault"),
                 }
-                let result= await UserModel.create(newUser)
+                let result= await userService.createUser(newUser)
+                // let result= await UserModel.create(newUser)
                 console.log('created');
                 return done(null, result)
             }
@@ -43,7 +46,8 @@ function initializePassport(){
         async (req, username, password, done) => {
             const {first_name, last_name, email} = req.body
             try {
-                let user = await UserModel.findOne({email: username})
+                // let user = await UserModel.findOne({email: username})
+                let user = await userService.getUserByEmail(username)
                 console.log(user)
                 if (user) {
                     console.log('El usuario ya existe')
@@ -57,17 +61,19 @@ function initializePassport(){
                     email,
                     password: createHash(password)
                 }
-                let result = await UserModel.create(newUser)
+                // let result = await UserModel.create(newUser)
+                let result= await userService.createUser(newUser)
                 return done(null, result)
             } catch (error) {
-                return done('Error al obrener el usuario'+error)
+                return done('Error al obtener el usuario'+error)
             }
         }
     ))
 
     passport.use('login', new LocalStrategy({usernameField: 'email'}, async (username, password, done) => {
         try {
-            const user= await UserModel.findOne({email: username})
+            // const usermodel = await UserModel.findOne({email: username})
+            const user = await userService.getUserByEmail(username)
             if (!user) {
                 console.log('Usuario no encontrado')
                 return done(null, false)
@@ -86,7 +92,8 @@ function initializePassport(){
     })
 
     passport.deserializeUser(async (id, done)=>{
-        let user = await UserModel.findById(id)
+        // let user = await UserModel.findById(id)
+        let user = await userService.getUser(id)
         done(null, user)
     })
 }

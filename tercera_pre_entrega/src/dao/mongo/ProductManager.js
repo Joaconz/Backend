@@ -1,4 +1,4 @@
-import ProductModel from "../models/product.js";
+import ProductModel from "../../models/product.js";
 
 export default class ProductManager {
   #products;
@@ -6,7 +6,7 @@ export default class ProductManager {
     this.#products = [];
   }
 
-  async getProducts(limit, page, query, sort) {
+  async get(limit, page, query, sort) {
     let getLimit = limit !== undefined ? limit : 10;
     let getPage = page !== undefined ? page : 1;
     let getQuery = query !== undefined ? { category: query } : {};
@@ -20,21 +20,14 @@ export default class ProductManager {
     return this.#products;
   }
 
-  async getProductById(id) {
+  async getById(id) {
     let product = await ProductModel.findById(id);
     return product;
   }
 
-  async addProduct(
-    title,
-    description,
-    price,
-    thumbnail,
-    code,
-    stock,
-    category
-  ) {
+  async createProduct(newProduct) {
     try {
+      const {title, description, price, thumbnail, code, stock, category} = newProduct
       let product = await ProductModel.create({
         title,
         description,
@@ -51,20 +44,22 @@ export default class ProductManager {
     }
   }
 
-  async updateProduct(id, obj) {
+  async update(id, obj) {
     try {
-      await ProductModel.findByIdAndUpdate(id, obj, (err, doc) => {
-        if (err) console.log(err);
-        else {
-          console.log("updated");
-        }
-      });
+      return await ProductModel.findByIdAndUpdate(id, obj, 
+      //   (err, doc) => {
+      //   if (err) console.log(err);
+      //   else {
+      //     console.log("updated");
+      //   }
+      // }
+      );
     } catch (error) {
       console.log(error);
     }
   }
 
-  async deleteProduct(id) {
+  async delete(id) {
     try {
       await ProductModel.findByIdAndDelete(id, (err, doc) => {
         if (err) console.log(err);

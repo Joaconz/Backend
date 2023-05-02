@@ -1,29 +1,33 @@
 import { request } from "express";
-import ProductManager from "../dao/ProductManager.js";
-const productManager = new ProductManager();
+import { productService } from "../services/index.js"
 
 class ProductController {
   getProducts = async (req = request, res) => {
     const { limit, page, query, sort } = req.query;
-    let products = await productManager.getProducts(limit, page, query, sort);
-    let info = {
-      status: products !== undefined ? "success" : "error",
-      payload: products.docs,
-      totalPages: products.totalPages,
-      prevPage: products.prevPage,
-      nextPage: products.nextPage,
-      page: products.page,
-      hasPrevPage: products.hasPrevPage,
-      hasNextPage: products.hasNextPage,
-      prevLink: products.prevLink,
-      nextLink: products.nextLink,
-    };
-    res.send(info);
+    const { docs, totalPages,hasPrevPage, hasNextPage, prevPage, nextPage } = await productService.getProducts(limit, page, query, sort);
+    if(!docs || docs.length === 0){
+      return res.status(404).json({
+          msg: 'No existen productos',
+          products: false
+      })
+  }   
+  res.status(200).json({
+      status: 'success',
+      payload: docs,
+      totalPages,
+      hasPrevPage,
+      hasNextPage,
+      prevPage,
+      nextPage,
+      prevLink: prevPage ? `http://localhost:8080/api/products?page=${prevPage}` : null,
+      nextLink: nextPage ? `http://localhost:8080/api/products?page=${nextPage}` : null,
+      page
+  })
   };
 
   getView = async (req = request, res) => {
     const { limit, page, query, sort } = req.query;
-    let info = await productManager.getProducts(limit, page, query, sort);
+    let info = await productService.getProducts(limit, page, query, sort);
     let products = info.docs;
     products = products.map((item) => item.toObject());
     if (req.session.user !== undefined) {
@@ -43,15 +47,13 @@ class ProductController {
     }
   };
 
-  // postView =  async (req=request, res) => {
 
-  // }
 
   getPID = async (req = request, res) => {
     const { pid } = req.params;
     console.log(pid);
-    let products = await productManager.getProductById(parseInt(pid));
-    // res.send(products);
+    let products = await productService.getProduct(parseInt(pid));
+    res.send(products);
     console.log(products);
   };
 
@@ -67,7 +69,7 @@ class ProductController {
     ) {
       return res.status(400).send({ message: "Completar los datos faltantes" });
     }
-    productManager.addProducts(
+    productService.createProduct(
       product.title,
       product.description,
       product.price,
@@ -88,7 +90,7 @@ class ProductController {
     let entries = Object.entries(product);
     entries.forEach(async (keyValue) => {
       console.log(pid, keyValue);
-      productManager.updateProduct(parseInt(pid), keyValue);
+      productService.updateProduct(parseInt(pid), keyValue);
     });
 
     res.status(201).send({
@@ -99,7 +101,7 @@ class ProductController {
 
   deleteProduct = async (req = request, res) => {
     const { pid } = req.params;
-    productManager.deleteProduct(parseInt(pid));
+    productService.deleteProduct(parseInt(pid));
     res.status(201).send({
       message: "Producto Eliminado",
     });

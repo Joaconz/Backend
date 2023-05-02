@@ -7,8 +7,8 @@ import SessionRouter from "./sessions.js"
 
 const router = Router()
 
-router.use('/api/products', auth('session'), ProductRouter)
-router.use('/api/carts', auth('session'), CartRouter)
-router.use('/auth', auth('session'), Auth)
-router.use('/api/sessions', SessionRouter)
+router.use('/api/products', auth(), ProductRouter)
+router.use('/api/carts', auth(), CartRouter)
+router.use('/auth', auth(), Auth)
+router.use('/api/sessions', auth(), SessionRouter)
 export default router

@@ -1,4 +1,4 @@
-import CartModel from "../models/cart.js"
+import CartModel from "../../models/cart.js"
 
 export default class CartManager { 
     #carts
@@ -6,7 +6,7 @@ export default class CartManager {
         this.#carts = []
     }
 
-    async createCart () {
+    async create () {
         try {
             await CartModel.create({
                 products: []
@@ -16,7 +16,7 @@ export default class CartManager {
         }
     }
 
-    async getCart (id) {
+    async getById (id) {
         try {
             return await CartModel.findById(id).populate("products.productId")
         } catch (error) {

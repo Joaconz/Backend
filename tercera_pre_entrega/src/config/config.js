@@ -34,7 +34,7 @@ let configObject = {
         secret: "s3cr3t123",
         resave: false,
         saveUninitialized: false,
-        maxAge: 15000000
+        maxAge: 1500000000
       }
 
 }
