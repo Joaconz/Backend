@@ -1,5 +1,7 @@
 import { request } from "express";
 import { productService } from "../services/index.js"
+import CustomError from "../services/errors/CustomError.js";
+import { EErrors } from "../services/errors/enums.js";
 
 class ProductController {
   getProducts = async (req = request, res) => {
@@ -31,7 +33,6 @@ class ProductController {
     let products = info.docs;
     products = products.map((item) => item.toObject());
     if (req.session.user !== undefined) {
-      console.log(req.session.admin);
       let user = {
         first_name: req.session.user.first_name
           ? req.session.user.first_name
@@ -43,7 +44,13 @@ class ProductController {
         products,
       });
     } else {
-      res.status(401).send({ status: "error", message: "No existe sesion" });
+      // res.status(401).send({ status: "error", message: "No existe sesion" });
+      CustomError.createError({
+        name: "Session has finished",
+        cause: sessionErrorInfo(),
+        message: "Error in setting a user from session",
+        code: EErrors.SESSION_ERROR
+      })
     }
   };
 
@@ -67,7 +74,21 @@ class ProductController {
       !product.stock ||
       !product.category
     ) {
-      return res.status(400).send({ message: "Completar los datos faltantes" });
+
+      // return res.status(400).send({ message: "Completar los datos faltantes" });
+      CustomError.createError({
+        name: "Product not created",
+        cause: createProductErrorInfo({
+          title : product.title, 
+          description : product.description,
+          code: product.code,
+          price: product.price,
+          stock: product.stock,
+          category: product.category
+        }),
+        message: "Error in creating a product",
+        code: EErrors.INVALID_TYPES_ERROR
+      })
     }
     productService.createProduct(
       product.title,

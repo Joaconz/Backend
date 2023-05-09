@@ -1,6 +1,9 @@
 import { request } from "express";
 import { createHash } from "../utils/bycriptPass.js";
 import { userService } from "../services/index.js";
+import CustomError from "../services/errors/CustomError.js";
+import { generateUserErrorInfo } from "../services/errors/info.js";
+import { EErrors } from "../services/errors/enums.js";
 
 class AuthController {
   githubCallback = async (req = request, res) => {
@@ -17,13 +20,24 @@ class AuthController {
 
   login = async (req = request, res) => {
     if (req.user === undefined) {
-      res
-        .status(401)
-        .send({ status: "error", message: "El usuario no existe" });
+      // res
+      //   .status(401)
+      //   .send({ status: "error", message: "El usuario no existe" });
+      CustomError.createError({
+        name: "Failed Login",
+        cause: generateUserErrorInfo({
+          first_name : req.user.first_name, 
+          last_name : req.user.first_name,
+          email: req.user.email,
+          role: req.user.role
+        }),
+        message: "Error in login and creating a session",
+        code: EErrors.SESSION_ERROR
+      })
     } else {
       const user = await userService.getUserByEmail(req.user.email);
       req.session.user = {
-        name: `${user.first_name} ${req.user.last_name}`,
+        name: `${req.user.first_name} ${req.user.last_name}`,
         email: user.email,
         role: user.role,
       };

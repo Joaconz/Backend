@@ -1,3 +1,5 @@
+import CustomError from "../services/errors/CustomError.js";
+import { EErrors } from "../services/errors/enums.js";
 export default class ProductService {
     constructor(dao){
         this.dao = dao
@@ -23,7 +25,20 @@ export default class ProductService {
         try {            
             return await this.dao.create(newProduct)                         
         } catch (error) {
-            return error
+            // return error
+            CustomError.createError({
+                name: "Product not created",
+                cause: createProductErrorInfo({
+                  title : product.title, 
+                  description : product.description,
+                  code: product.code,
+                  price: product.price,
+                  stock: product.stock,
+                  category: product.category
+                }),
+                message: "Error in creating a product",
+                code: EErrors.INVALID_TYPES_ERROR
+              })
         }
     }
 
