@@ -34,8 +34,6 @@ router.post(
 );
 
 router.post("/restorepass", 
-// passport.authenticate("restorepass", { failureRedirect: "/auth/failrestore" }),
-// passport.authenticate("jwt"),
 authController.restorePass);
 
 

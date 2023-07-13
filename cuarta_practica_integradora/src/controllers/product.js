@@ -2,6 +2,7 @@ import { request } from "express";
 import { productService } from "../services/index.js";
 import CustomError from "../services/errors/CustomError.js";
 import { EErrors } from "../services/errors/enums.js";
+import { sendEmail } from "../utils/mailer.js";
 
 class ProductController {
   getProducts = async (req = request, res) => {
@@ -10,7 +11,7 @@ class ProductController {
       await productService.getProducts(limit, page, query, sort);
     if (!docs || docs.length === 0) {
       return res.status(404).json({
-        msg: "No existen productos",
+        msg: "There are no products",
         products: false,
       });
     }
@@ -70,7 +71,6 @@ class ProductController {
       !product.stock ||
       !product.category
     ) {
-      // return res.status(400).send({ message: "Completar los datos faltantes" });
       CustomError.createError({
         name: "Product not created",
         cause: createProductErrorInfo({
@@ -98,7 +98,7 @@ class ProductController {
     });
     res.status(201).send({
       product,
-      message: "producto agregado",
+      message: "product added",
     });
   };
 
@@ -125,11 +125,11 @@ class ProductController {
 
       res.status(201).send({
         product,
-        message: "Producto modificado",
+        message: "Product modified",
       });
     } else {
       res.status(400).send({
-        message: "No puedes modificar el producto",
+        message: "You can't modify the product",
       });
     }
   };
@@ -150,12 +150,20 @@ class ProductController {
       req.session.user.role === "admin"
     ) {
       productService.deleteProduct(parseInt(pid));
+      const configSendMail = {
+        userMail: req.session.user.email,
+        subject: "Product deleted",
+        html: `<div>
+            <h2>You have deleted the product with the followed id: ${pid}</h2>
+          </div>`,
+      };
+      sendEmail(configSendMail);
       res.status(201).send({
-        message: "Producto Eliminado",
+        message: "Product deleted",
       });
     } else {
       res.status(400).send({
-        message: "No puedes eliminar el producto",
+        message: "You can't delete the product",
       });
     }
   };

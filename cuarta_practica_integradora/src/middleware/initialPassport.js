@@ -1,12 +1,9 @@
 import passport from "passport";
-// import UserModel from '../models/user.js'
 import local from "passport-local";
 import GithubStrategy from "passport-github2";
 import { createHash, isValidPassword } from "../utils/bycriptPass.js";
 import { userService } from "../services/index.js";
 import { Strategy, ExtractJwt } from "passport-jwt";
-
-// const {Strategy, ExtractJwt} = require('passport-jwt')
 
 const JWTStrategy = Strategy;
 const ExtractJWT = ExtractJwt;
@@ -34,7 +31,6 @@ function initializePassport() {
       async (accessToken, refreshToken, profile, done) => {
         console.log("Profile: ", profile);
         try {
-          // let user = await UserModel.findOne({email: profile._json.email})
           let user = await userService.getUserByEmail(profile._json.email);
           if (!user) {
             let newUser = {
@@ -44,12 +40,10 @@ function initializePassport() {
               password: createHash("passwordDefault"),
             };
             let result = await userService.createUser(newUser);
-            // let result= await UserModel.create(newUser)
             console.log("created");
             return done(null, result);
           }
 
-          // return done(null,false,{messages:'User Already exists'})
           return done(null, user);
         } catch (error) {
           return done(error);
@@ -62,13 +56,12 @@ function initializePassport() {
     "register",
     new LocalStrategy(
       {
-        passReqToCallback: true, // acceso a la request (req)
+        passReqToCallback: true,
         usernameField: "email",
       },
       async (req, username, password, done) => {
         const { first_name, last_name, email } = req.body;
         try {
-          // let user = await UserModel.findOne({email: username})
           let user = await userService.getUserByEmail(username);
           console.log(user);
           if (user) {
@@ -76,14 +69,12 @@ function initializePassport() {
             return done(null, false);
           }
 
-          // crea el usuario
           let newUser = {
             first_name,
             last_name,
             email,
             password: createHash(password),
           };
-          // let result = await UserModel.create(newUser)
           let result = await userService.createUser(newUser);
           return done(null, result);
         } catch (error) {
@@ -112,40 +103,6 @@ function initializePassport() {
       }
     )
   );
-
-  // passport.use(
-  //   "restorepass",
-  //   new LocalStrategy(
-  //       {
-  //           passReqToCallback: true, // acceso a la request (req)
-  //           // usernameField: "email",
-  //         },
-  //     async (req, username, password, done) => {
-  //       console.log(username, password);
-  //       try {
-  //         const { newPassword, email } = req.body;
-  //         console.log(email);
-  //         const user = await userService.getUserByEmail(email);
-  //         if (!user)
-  //           return res
-  //             .status(401)
-  //             .send({ status: "error", message: "El usuario no existe" });
-  //         if (isValidPassword(user, newPassword)) {
-  //           return res
-  //             .status(401)
-  //             .send({ status: "error", message: "La contraseña es la misma" });
-  //         } else {
-  //           let newPassword = createHash(newPassword);
-  //           await userService.updateUser(user._id, newPassword);
-  //           return done(null, result);
-  //         }
-  //       } catch (error) {
-  //           console.log(error);
-  //           return done("Error al actualizar la contraseña" + error);
-  //       }
-  //     }
-  //   )
-  // );
 
   passport.serializeUser((user, done) => {
     done(null, user.id);

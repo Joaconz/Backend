@@ -3,12 +3,13 @@ import { cartService, productService, ticketService, userService } from "../serv
 import {transport} from "../utils/mailer.js";
 
 class CartController {
+
   getView = async (req = request, res) => {
-    if (req.session.user){
+    if (req.session.user !== undefined) {
       const user = await userService.getUserByEmail(req.session.user.email)
       if (user.cartId !== undefined) {
+        this.cartId == user.cartId
         let info = await cartService.getCart(user.cartId);
-        console.log(user.cartId);
         let products = info.products;
         products = products.map((item) => item.toObject());
         let cart = {
@@ -21,29 +22,23 @@ class CartController {
       }
       else {
         let newCart = await cartService.create()
-        console.log(newCart);
         await userService.updateUser(user._id, {cartId: newCart._id})
+        this.cartId == newCart._id
+        res.render("carts", {
+          newCart,
+        });
       }
+    }
+    else {
+      res.redirect("../../auth/login");
     }
   };
 
-  createCart = async (req = request, res) => {
-    //crear un carrito con id y array de products vacio
-    const newCart = await cartService.create();
-    console.log(newCart);
-    res.status(201).send("New Cart created");
-  };
-
-  getCart = async (req = request, res) => {
-    const { cid } = req.params;
-    let cart = await cartService.getCart(cid);
-    res.status(201).send({ products: cart.products });
-  };
-
   addProductQuantity = async (req = request, res) => {
-    const { cid, pid } = req.params;
+    const { pid } = req.params;
     const { quantity } = req.body;
-    let cart = await cartService.addProductQuantity(cid, pid, quantity);
+    const user = await userService.getUserByEmail(req.session.user.email)
+    let cart = await cartService.addProductQuantity(user.cartId, pid, quantity);
     res.status(201).send({
       "new cart": cart,
       message: "Product added",
@@ -51,7 +46,7 @@ class CartController {
   };
 
   addProduct = async (req = request, res) => {
-    const { cid, pid } = req.params;
+    const { pid } = req.params;
     if (req.session.user === undefined) {
       CustomError.createError({
         name: "Session has finished",
@@ -66,7 +61,8 @@ class CartController {
         message: "You cant add your own product to your cart"
       });
     }
-    let cart = await cartService.addProduct(cid, pid);
+    const user = await userService.getUserByEmail(req.session.user.email)
+    let cart = await cartService.addProduct(user.cartId, pid);
     res.status(201).send({
       "new cart": cart,
       message: "Product added",
@@ -74,9 +70,9 @@ class CartController {
   };
 
   addProducts = async (req = request, res) => {
-    const { cid } = req.params;
     let array = req.body;
-    let cart = await cartService.addProducts(cid, array);
+    const user = await userService.getUserByEmail(req.session.user.email)
+    let cart = await cartService.addProducts(user.cartId, array);
     res.status(201).send({
       "new cart": cart,
       message: "Products added",
@@ -84,17 +80,21 @@ class CartController {
   };
 
   deleteProduct = async (req = request, res) => {
-    const { cid, pid } = req.params;
-    let cart = await cartService.deleteProduct(cid, pid);
-    res.status(201).send({
-      "new cart": cart,
-      message: "Product deleted",
-    });
+    const { pid } = req.params;
+    if (req.session.user) {
+      const user = await userService.getUserByEmail(req.session.user.email)
+      let cart = await cartService.deleteProduct(user.cartId.toString(), pid.toString());
+      console.log(cart);
+      res.status(201).send({
+        "new cart": cart,
+        message: "Product deleted",
+      });
+    }
   };
 
   deleteCart = async (req = request, res) => {
-    const { cid } = req.params;
-    let cart = await cartService.deleteCart(cid);
+    const user = await userService.getUserByEmail(req.session.user.email)
+    let cart = await cartService.deleteCart(user.cartId);
     res.status(201).send({
       "new cart": cart,
       message: "Cart deleted",
@@ -102,8 +102,8 @@ class CartController {
   };
 
   finishProcess = async (req = request, res) => {
-    const { cid } = req.params;
-    let cart = await cartService.getCart(cid)
+    const user = await userService.getUserByEmail(req.session.user.email)
+    let cart = await cartService.getCart(user.cartId)
     let confirmation = await cartService.finishProcess(cart)
     if (confirmation.products.length > 0) {
       let user = await userService.getUserByEmail(req.session.user.email)
@@ -134,11 +134,12 @@ class CartController {
         "new cart": confirmation,
         message: "Cart Processed",
       });
+      // res.render("carts", {
+      //   cart,
+      // });
     }
     else {
       res.status(400).send({
-        // "new ticket": ticket,
-        // "new cart": confirmation,
         message: "We couldn't finish the purchase, please add products with stock",
       });
     }

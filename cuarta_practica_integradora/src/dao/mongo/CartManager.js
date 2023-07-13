@@ -28,7 +28,7 @@ export default class CartManager {
     async addProduct (cid, pid) {
         try {
             let cart = await CartModel.findById(cid)
-            let product = cart.products.findIndex(prod => prod.productId == pid)
+            let product = cart.products.findIndex(prod => prod.productId.toString() == pid)
             if (product > -1) {
                 cart.products[product].quantity++
                 let update = await CartModel.findByIdAndUpdate(cid, cart)
@@ -46,16 +46,14 @@ export default class CartManager {
     async addProductQuantity (cid, pid, quantity) {
         try {
             let cart = await CartModel.findById(cid)
-            let product = cart.products.findIndex(prod => prod.productId == pid)
+            let product = cart.products.findIndex(prod => prod.productId.toString() == pid)
             if (product === -1) {
                 cart.products.push({productId: pid})
                 let update = await CartModel.findByIdAndUpdate(cid, cart)
                 return update
             } else {
                 cart.products[product].quantity = parseInt(quantity)
-                console.log(cart.products[product].quantity);
                 let update = await CartModel.findByIdAndUpdate(cid, cart)
-                console.log('founded');
                 return update
             }
         } catch (error) {
@@ -69,7 +67,7 @@ export default class CartManager {
             array.forEach(async element => {
                 console.log(element);
                 const { prodId, quantity } = element
-                let id = cart.products.findIndex(prod => prod.productId == prodId)
+                let id = cart.products.findIndex(prod => prod.productId.toString() == prodId)
                 if (id > -1) {
                     console.log("Este producto ya existe");
                     cart.products[id].quantity += parseInt(quantity)
@@ -89,7 +87,7 @@ export default class CartManager {
     async deleteProduct(cid, pid) {
         try {
             let cart = await CartModel.findById(cid)
-            let product = cart.products.findIndex(prod => prod.productId == pid)
+            let product = cart.products.findIndex(prod => prod.productId.toString() == pid)
             if (product > -1) {
                 cart.products.splice((product), 1)
                 let update = await CartModel.findByIdAndUpdate(cid, cart)
